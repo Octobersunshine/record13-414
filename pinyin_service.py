@@ -2,6 +2,26 @@ import unicodedata
 from pypinyin import pinyin, Style
 
 
+NEUTRAL_TONE_CHARS = {
+    '了': 'le',
+    '的': 'de',
+    '地': 'de',
+    '得': 'de',
+    '吗': 'ma',
+    '呢': 'ne',
+    '吧': 'ba',
+    '啊': 'a',
+    '呀': 'ya',
+    '哇': 'wa',
+    '嘛': 'ma',
+    '么': 'me',
+    '啦': 'la',
+    '咯': 'lo',
+    '呗': 'bei',
+    '嘞': 'lei',
+}
+
+
 def _is_cjk_char(ch):
     cp = ord(ch)
     return (0x4E00 <= cp <= 0x9FFF or
@@ -20,18 +40,64 @@ def _char_display_width(ch):
     return 1
 
 
-def _pinyin_for_char(ch):
-    result = pinyin(ch, style=Style.TONE, heteronym=False)
-    if result and result[0]:
-        return result[0][0]
-    return ch
+def _has_tone_mark(py):
+    tone_chars = 'āáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜ'
+    return any(c in tone_chars for c in py.lower())
+
+
+def _get_phrase_pinyin_map(text):
+    py_results = pinyin(text, style=Style.TONE, heteronym=False)
+    py_map = []
+    chars = list(text)
+    py_idx = 0
+    i = 0
+    while i < len(chars):
+        ch = chars[i]
+        if _is_cjk_char(ch):
+            py_str = py_results[py_idx][0] if (py_idx < len(py_results) and py_results[py_idx]) else ch
+            py_map.append((ch, py_str))
+            py_idx += 1
+            i += 1
+        else:
+            seg_start = i
+            while i < len(chars) and not _is_cjk_char(chars[i]):
+                i += 1
+            seg_py = py_results[py_idx][0] if (py_idx < len(py_results) and py_results[py_idx]) else ''
+            py_idx += 1
+            for j in range(seg_start, i):
+                py_map.append((chars[j], chars[j]))
+    return py_map
+
+
+def _resolve_pinyin(ch, py_from_phrase, prev_char=None):
+    if not _is_cjk_char(ch):
+        return ch
+    if ch in NEUTRAL_TONE_CHARS:
+        neutral_py = NEUTRAL_TONE_CHARS[ch]
+        if py_from_phrase and _has_tone_mark(py_from_phrase):
+            if prev_char and _is_cjk_char(prev_char):
+                return neutral_py
+            return py_from_phrase
+        if py_from_phrase and py_from_phrase.lower() == neutral_py.lower():
+            return neutral_py
+        return neutral_py
+    return py_from_phrase if py_from_phrase else ch
+
+
+def _annotate_chars(text):
+    py_map = _get_phrase_pinyin_map(text)
+    resolved = []
+    for i, (ch, py) in enumerate(py_map):
+        prev = py_map[i - 1][0] if i > 0 else None
+        resolved_py = _resolve_pinyin(ch, py, prev)
+        resolved.append((ch, resolved_py))
+    return resolved
 
 
 def annotate_inline(text):
     parts = []
-    for ch in text:
+    for ch, py in _annotate_chars(text):
         if _is_cjk_char(ch):
-            py = _pinyin_for_char(ch)
             parts.append(f"{ch}({py})")
         else:
             parts.append(ch)
@@ -52,9 +118,8 @@ def annotate_above(text):
     COL_WIDTH = 6
     pinyin_cells = []
     hanzi_cells = []
-    for ch in text:
+    for ch, py in _annotate_chars(text):
         if _is_cjk_char(ch):
-            py = _pinyin_for_char(ch)
             pinyin_cells.append(_pad_center(py, COL_WIDTH))
             hanzi_cells.append(_pad_center(ch, COL_WIDTH))
         else:
@@ -77,6 +142,13 @@ if __name__ == '__main__':
         "中华人民共和国",
         "学习python编程",
         "春天来了，花儿开了。",
+        "我的书在桌子上。",
+        "他跑得很快。",
+        "你好吗？我们走吧！",
+        "这是为什么呢？",
+        "了解情况的目的",
+        "飞快地跑",
+        "好得很",
     ]
     for s in samples:
         print("=" * 40)
