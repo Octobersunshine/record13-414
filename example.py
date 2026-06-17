@@ -31,6 +31,50 @@ def main():
     result = service.to_pinyin_list(text, mode='full', with_tone=True)
     print(f'原文: {text}')
     print(f'  带声调列表: {result}')
+    print()
+
+    print('=== 多音字处理演示 ===')
+    polyphone_tests = [
+        ('重庆', 'chóng qìng'),
+        ('重庆大学', 'chóng qìng dà xué'),
+        ('重量', 'zhòng liàng'),
+        ('重要', 'zhòng yào'),
+        ('重新', 'chóng xīn'),
+        ('长度', 'cháng dù'),
+        ('长大', 'zhǎng dà'),
+        ('银行', 'yín háng'),
+        ('行走', 'xíng zǒu'),
+        ('快乐', 'kuài lè'),
+        ('音乐', 'yīn yuè'),
+        ('爱好', 'ài hào'),
+        ('好人', 'hǎo rén'),
+        ('睡觉', 'shuì jiào'),
+        ('感觉', 'gǎn jué'),
+        ('还是', 'hái shì'),
+        ('归还', 'guī huán'),
+        ('朝阳', 'zhāo yáng'),
+        ('朝代', 'cháo dài'),
+    ]
+
+    for text, expected in polyphone_tests:
+        result = service.full_pinyin_with_tone(text)
+        status = '✓' if result == expected else '✗'
+        print(f'  {status} {text}: {result}')
+    print()
+
+    print('--- 多音字读音查询 ---')
+    for char in ['重', '长', '行', '乐', '好']:
+        readings = service.get_polyphone_readings(char, with_tone=True)
+        print(f'  「{char}」的所有读音: {", ".join(readings)}')
+    print()
+
+    print('--- 自定义词典注册 ---')
+    print('  注册前:')
+    print(f'    人行: {service.full_pinyin_with_tone("人行")}')
+
+    service.register_phrase('人行', [['rén'], ['háng']])
+    print('  注册「人行」为 rén háng 后:')
+    print(f'    人行: {service.full_pinyin_with_tone("人行")}')
 
 
 if __name__ == '__main__':
