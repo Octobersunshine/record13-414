@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>拼音标注 HTML 测试</title>
+    <style>
+        body {
+            font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 0 20px;
+            line-height: 2;
+            font-size: 18px;
+        }
+        h1 {
+            color: #333;
+            border-bottom: 2px solid #4a90e2;
+            padding-bottom: 10px;
+        }
+        .sample {
+            margin: 30px 0;
+            padding: 20px;
+            background: #f7f9fc;
+            border-radius: 8px;
+            border-left: 4px solid #4a90e2;
+        }
+        .label {
+            font-size: 14px;
+            color: #888;
+            margin-bottom: 8px;
+        }
+        .text-content {
+            font-size: 24px;
+        }
+        .default-ruby ruby {
+            ruby-position: over;
+        }
+        .default-ruby rt {
+            font-size: 0.5em;
+            color: #666;
+        }
+        code {
+            background: #f0f0f0;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <h1>HTML <code>&lt;ruby&gt;</code> 拼音标注演示</h1>
+
+    <p>以下展示两种 <code>&lt;ruby&gt;</code> 渲染方式：浏览器默认样式和自定义 CSS 样式。</p>
+
+    <div class="sample">
+        <div class="label">1. 浏览器默认 ruby 样式（无自定义 CSS）</div>
+        <div class="text-content default-ruby">
+            <ruby>你<rp>(</rp><rt>nǐ</rt><rp>)</rp>好<rp>(</rp><rt>hǎo</rt><rp>)</rp></ruby>，
+            <ruby>春<rp>(</rp><rt>chūn</rt><rp>)</rp>天<rp>(</rp><rt>tiān</rt><rp>)</rp>来<rp>(</rp><rt>lái</rt><rp>)</rp>了<rp>(</rp><rt>le</rt><rp>)</rp></ruby>！
+        </div>
+    </div>
+
+    <div class="sample">
+        <div class="label">2. pinyin_service 的自定义 CSS 样式（flex 布局居中对齐）</div>
+        <div class="text-content">
+            <style>ruby { display: inline-flex; flex-direction: column-reverse; text-align: center; line-height: 1.2; margin: 0 0.1em; } rt { font-size: 0.6em; line-height: 1.2; color: #666; } rp { display: none; }</style><ruby>你<rp>(</rp><rt>nǐ</rt><rp>)</rp>好<rp>(</rp><rt>hǎo</rt><rp>)</rp></ruby>，
+            <ruby>春<rp>(</rp><rt>chūn</rt><rp>)</rp>天<rp>(</rp><rt>tiān</rt><rp>)</rp>来<rp>(</rp><rt>lái</rt><rp>)</rp>了<rp>(</rp><rt>le</rt><rp>)</rp></ruby>！
+        </div>
+    </div>
+
+    <div class="sample">
+        <div class="label">3. 完整示例 — 《春晓》</div>
+        <div class="text-content">
+            <style>ruby { display: inline-flex; flex-direction: column-reverse; text-align: center; line-height: 1.2; margin: 0 0.1em; } rt { font-size: 0.6em; line-height: 1.2; color: #666; } rp { display: none; }</style><ruby>春<rp>(</rp><rt>chūn</rt><rp>)</rp>晓<rp>(</rp><rt>xiǎo</rt><rp>)</rp></ruby><br>
+            <ruby>春<rp>(</rp><rt>chūn</rt><rp>)</rp>眠<rp>(</rp><rt>mián</rt><rp>)</rp>不<rp>(</rp><rt>bù</rt><rp>)</rp>觉<rp>(</rp><rt>jué</rt><rp>)</rp>晓<rp>(</rp><rt>xiǎo</rt><rp>)</rp></ruby>，<br>
+            <ruby>处<rp>(</rp><rt>chù</rt><rp>)</rp>处<rp>(</rp><rt>chù</rt><rp>)</rp>闻<rp>(</rp><rt>wén</rt><rp>)</rp>啼<rp>(</rp><rt>tí</rt><rp>)</rp>鸟<rp>(</rp><rt>niǎo</rt><rp>)</rp></ruby>。<br>
+            <ruby>夜<rp>(</rp><rt>yè</rt><rp>)</rp>来<rp>(</rp><rt>lái</rt><rp>)</rp>风<rp>(</rp><rt>fēng</rt><rp>)</rp>雨<rp>(</rp><rt>yǔ</rt><rp>)</rp>声<rp>(</rp><rt>shēng</rt><rp>)</rp></ruby>，<br>
+            <ruby>花<rp>(</rp><rt>huā</rt><rp>)</rp>落<rp>(</rp><rt>luò</rt><rp>)</rp>知<rp>(</rp><rt>zhī</rt><rp>)</rp>多<rp>(</rp><rt>duō</rt><rp>)</rp>少<rp>(</rp><rt>shǎo</rt><rp>)</rp></ruby>。
+        </div>
+    </div>
+
+    <div class="sample">
+        <div class="label">4. 混合中英文 + 轻声词</div>
+        <div class="text-content">
+            <style>ruby { display: inline-flex; flex-direction: column-reverse; text-align: center; line-height: 1.2; margin: 0 0.1em; } rt { font-size: 0.6em; line-height: 1.2; color: #666; } rp { display: none; }</style>
+            <ruby>我<rp>(</rp><rt>wǒ</rt><rp>)</rp>的<rp>(</rp><rt>de</rt><rp>)</rp></ruby> python
+            <ruby>编<rp>(</rp><rt>biān</rt><rp>)</rp>程<rp>(</rp><rt>chéng</rt><rp>)</rp>书<rp>(</rp><rt>shū</rt><rp>)</rp></ruby>
+            <ruby>跑<rp>(</rp><rt>pǎo</rt><rp>)</rp>得<rp>(</rp><rt>de</rt><rp>)</rp></ruby>
+            <ruby>飞<rp>(</rp><rt>fēi</rt><rp>)</rp>快<rp>(</rp><rt>kuài</rt><rp>)</rp>！
+        </div>
+    </div>
+
+    <div class="sample">
+        <div class="label">5. 不支持 ruby 的浏览器降级显示（<code>&lt;rp&gt;</code> 标签）</div>
+        <div class="text-content" style="font-family: monospace;">
+            你(nǐ)好(hǎo)，春(chūn)天(tiān)来(le)了！
+        </div>
+    </div>
+</body>
+</html>

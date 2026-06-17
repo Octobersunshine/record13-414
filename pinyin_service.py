@@ -130,10 +130,43 @@ def annotate_above(text):
     return f"{pinyin_line}\n{hanzi_line}"
 
 
-def annotate(text, fmt='above'):
+def annotate(text, fmt='above', **kwargs):
     if fmt == 'inline':
         return annotate_inline(text)
+    if fmt == 'html':
+        return annotate_html(text, **kwargs)
     return annotate_above(text)
+
+
+def annotate_html(text, css=True):
+    html_parts = []
+    if css:
+        html_parts.append(
+            '<style>ruby { display: inline-flex; flex-direction: column-reverse; '
+            'text-align: center; line-height: 1.2; margin: 0 0.1em; } '
+            'rt { font-size: 0.6em; line-height: 1.2; color: #666; } '
+            'rp { display: none; }</style>'
+        )
+    i = 0
+    chars = _annotate_chars(text)
+    while i < len(chars):
+        ch, py = chars[i]
+        if _is_cjk_char(ch):
+            start = i
+            while i < len(chars) and _is_cjk_char(chars[i][0]):
+                i += 1
+            html_parts.append('<ruby>')
+            for j in range(start, i):
+                c, p = chars[j]
+                html_parts.append(f'{c}<rp>(</rp><rt>{p}</rt><rp>)</rp>')
+            html_parts.append('</ruby>')
+        else:
+            seg_start = i
+            while i < len(chars) and not _is_cjk_char(chars[i][0]):
+                i += 1
+            seg = ''.join(chars[j][0] for j in range(seg_start, i))
+            html_parts.append(seg)
+    return ''.join(html_parts)
 
 
 if __name__ == '__main__':
@@ -159,4 +192,7 @@ if __name__ == '__main__':
         print()
         print("【行内标注】")
         print(annotate(s, fmt='inline'))
+        print()
+        print("【HTML 标注】")
+        print(annotate(s, fmt='html'))
         print()
